@@ -90,8 +90,8 @@ Ou baixe o instalador `.msi` em [adoptium.net](https://adoptium.net).
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/javachat.git
-cd javachat
+git clone https://github.com/Knightiel/MessageApp-with-sockets.git
+cd MessageApp-with-sockets
 
 # Crie a pasta de saída
 mkdir -p bin
