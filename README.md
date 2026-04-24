@@ -1,4 +1,4 @@
-# 💬 JavaChat — Aplicativo de Mensagens com Sockets e Multithreading
+# 💬 MessageApp — Aplicativo de Mensagens com Sockets e Multithreading
 
 Aplicativo de chat peer-to-peer desenvolvido em **Java puro**, sem dependências externas, com comunicação bidirecional entre clientes via servidor central. Suporta envio de **mensagens de texto** e **transferência de arquivos** em tempo real.
 
@@ -20,7 +20,7 @@ Aplicativo de chat peer-to-peer desenvolvido em **Java puro**, sem dependências
 
 ## Sobre o Projeto
 
-JavaChat é um sistema de mensagens cliente-servidor implementado com **sockets TCP** e **multithreading**, desenvolvido como exercício prático de programação concorrente e comunicação em rede. Toda a comunicação entre clientes passa pelo servidor, que atua exclusivamente como roteador — sem armazenar mensagens.
+MessageApp é um sistema de mensagens cliente-servidor implementado com **sockets TCP** e **multithreading**, desenvolvido como exercício prático de programação concorrente e comunicação em rede. Toda a comunicação entre clientes passa pelo servidor, que atua exclusivamente como roteador — sem armazenar mensagens.
 
 ---
 
