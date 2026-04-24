@@ -4,10 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
-/**
- * Servidor de Chat - responsável por rotear mensagens e arquivos entre clientes.
- * Mantém log de conexões em arquivo.
- */
 public class Server {
 
     private static final int PORT = 9090;
@@ -31,10 +27,7 @@ public class Server {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Registro / remoção de clientes
-    // ------------------------------------------------------------------ //
-
+    // registro de usuario
     static boolean register(String username, ClientHandler handler) {
         if (clients.containsKey(username)) return false;
         clients.put(username, handler);
@@ -48,14 +41,8 @@ public class Server {
         broadcastSystemMessage(username + " saiu do chat.");
     }
 
-    // ------------------------------------------------------------------ //
-    //  Roteamento de mensagens de texto
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Roteia uma mensagem de texto de um remetente para um destinatário.
-     * @return true se o destinatário existe, false caso contrário.
-     */
+    // Roteamento de mensagens de texto
+    // @return true se o destinatário existe, false caso contrário.
     static boolean routeMessage(String from, String to, String message) {
         ClientHandler dest = clients.get(to);
         if (dest == null) return false;
@@ -63,14 +50,7 @@ public class Server {
         return true;
     }
 
-    // ------------------------------------------------------------------ //
-    //  Roteamento de arquivos
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Roteia um arquivo de um remetente para um destinatário.
-     * @return true se o destinatário existe, false caso contrário.
-     */
+    // Roteamento de arquivos
     static boolean routeFile(String from, String to, String fileName, byte[] data) {
         ClientHandler dest = clients.get(to);
         if (dest == null) return false;
@@ -78,19 +58,13 @@ public class Server {
         return true;
     }
 
-    // ------------------------------------------------------------------ //
-    //  Lista de usuários conectados
-    // ------------------------------------------------------------------ //
-
+    // Lista usuarios
     static String getUserList() {
         if (clients.isEmpty()) return "[servidor] Nenhum usuário conectado.";
         return "[servidor] Usuários conectados: " + String.join(", ", clients.keySet());
     }
-
-    // ------------------------------------------------------------------ //
+    
     //  Mensagem de sistema para todos
-    // ------------------------------------------------------------------ //
-
     private static void broadcastSystemMessage(String text) {
         String msg = "[servidor] " + text;
         for (ClientHandler h : clients.values()) {
@@ -98,10 +72,7 @@ public class Server {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Log em arquivo
-    // ------------------------------------------------------------------ //
-
+    //Log de mensagens  (historico local)
     private static void logConnection(String username, String ip) {
         String ts = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String line = ts + " | " + username + " | " + ip;

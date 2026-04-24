@@ -2,16 +2,6 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 
-/**
- * Client – conecta ao servidor de chat e permite enviar/receber mensagens e arquivos.
- *
- * Comandos disponíveis:
- *   /send message <destinatario> <mensagem>   – envia mensagem de texto
- *   /send file <destinatario> <caminho>       – envia arquivo
- *   /users                                    – lista usuários conectados
- *   /sair                                     – encerra a conexão
- *   /help                                     – exibe ajuda
- */
 public class Client {
 
     private static final String HOST = "127.0.0.1";
@@ -27,10 +17,6 @@ public class Client {
         this.username = username;
     }
 
-    // ------------------------------------------------------------------ //
-    //  Conexão
-    // ------------------------------------------------------------------ //
-
     void connect() throws IOException {
         socket = new Socket(HOST, PORT);
         in  = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -40,10 +26,6 @@ public class Client {
         out.writeUTF("REGISTER:" + username);
         out.flush();
     }
-
-    // ------------------------------------------------------------------ //
-    //  Inicialização das threads
-    // ------------------------------------------------------------------ //
 
     void start() throws IOException {
         connect();
@@ -60,11 +42,8 @@ public class Client {
         try { reader.join(2000); } catch (InterruptedException ignored) {}
         close();
     }
-
-    // ------------------------------------------------------------------ //
-    //  Loop de leitura – roda em thread separada
-    // ------------------------------------------------------------------ //
-
+    
+    // Loop de leitura
     private void readLoop() {
         try {
             while (running) {
@@ -110,10 +89,7 @@ public class Client {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Loop de escrita – roda na thread principal
-    // ------------------------------------------------------------------ //
-
+    // Loop de escrita
     private void writeLoop() {
         BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
         printHelp();
@@ -170,10 +146,7 @@ public class Client {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Envio de arquivo
-    // ------------------------------------------------------------------ //
-
+    
     private void sendFile(String to, String filePath) throws IOException {
         Path p = Paths.get(filePath);
         if (!Files.exists(p) || !Files.isRegularFile(p)) {
@@ -191,10 +164,7 @@ public class Client {
         }
     }
 
-    // ------------------------------------------------------------------ //
     //  Recepção / gravação de arquivo
-    // ------------------------------------------------------------------ //
-
     private void saveFile(String fileName, byte[] data) {
         // Garante nome seguro (sem path traversal)
         String safeName = Paths.get(fileName).getFileName().toString();
@@ -216,10 +186,6 @@ public class Client {
             System.err.println("[erro] Falha ao salvar arquivo: " + e.getMessage());
         }
     }
-
-    // ------------------------------------------------------------------ //
-    //  Utilitários
-    // ------------------------------------------------------------------ //
 
     private void send(String msg) throws IOException {
         synchronized (out) {
@@ -248,10 +214,6 @@ public class Client {
                         "                ║     Exibe esta ajuda.                                ║\r\n" + //
                         "                ╚══════════════════════════════════════════════════════╝");
     }
-
-    // ------------------------------------------------------------------ //
-    //  Main
-    // ------------------------------------------------------------------ //
 
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {

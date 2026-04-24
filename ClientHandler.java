@@ -1,21 +1,9 @@
 import java.io.*;
 import java.net.*;
 
-/**
- * ClientHandler – roda em uma thread dedicada para cada cliente conectado.
- *
- * Protocolo de comunicação (linha de texto + bloco binário para arquivos):
- *
- *   TEXT:<remetente>:<mensagem>               → mensagem de texto
- *   FILE:<remetente>:<nomeArquivo>:<tamanho>  → cabeçalho de arquivo (seguido pelos bytes)
- *   SYS:<texto>                               → mensagem de sistema
- *
- * Comandos recebidos do cliente:
- *   REGISTER:<username>
- *   MSG:<destinatario>:<mensagem>
- *   FILE:<destinatario>:<nomeArquivo>:<tamanho>  (seguido pelos bytes do arquivo)
- *   USERS
- *   QUIT
+/*
+ ClientHandler – roda em uma thread dedicada para cada cliente conectado.
+ Protocolo de comunicação (linha de texto + bloco binário para arquivos):
  */
 public class ClientHandler implements Runnable {
 
@@ -32,10 +20,7 @@ public class ClientHandler implements Runnable {
         return socket.getRemoteSocketAddress().toString();
     }
 
-    // ------------------------------------------------------------------ //
-    //  Thread principal
-    // ------------------------------------------------------------------ //
-
+    // Thread principal
     @Override
     public void run() {
         try {
@@ -63,7 +48,7 @@ public class ClientHandler implements Runnable {
                 try {
                     line = in.readUTF();
                 } catch (EOFException | SocketException e) {
-                    break; // cliente desconectou
+                    break; // exit do usuario
                 }
 
                 if (line.startsWith("QUIT")) {
@@ -90,11 +75,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Handlers de comandos
-    // ------------------------------------------------------------------ //
-
-    /** Formato: MSG:<destinatario>:<mensagem> */
+    // Formato: MSG:<destinatario>:<mensagem>
     private void handleTextMessage(String line) throws IOException {
         // Divide em no máximo 3 partes para preservar ':' na mensagem
         String[] parts = line.split(":", 3);
@@ -116,7 +97,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /** Formato: FILE:<destinatario>:<nomeArquivo>:<tamanho> + bytes */
+    // Formato: FILE:<destinatario>:<nomeArquivo>:<tamanho> + bytes
     private void handleFileTransfer(String line) throws IOException {
         String[] parts = line.split(":", 4);
         if (parts.length < 4) {
@@ -138,7 +119,7 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        // Lê os bytes do arquivo enviados pelo cliente
+        // Le os bytes do arquivo enviados pelo cliente
         byte[] data = new byte[(int) fileSize];
         in.readFully(data);
 
@@ -149,11 +130,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Métodos de envio (chamados pelo Server para rotear dados)
-    // ------------------------------------------------------------------ //
-
-    /** Envia uma mensagem de texto de outro cliente para este. */
+    // Envia uma mensagem de texto de outro usuario para este
     synchronized void sendTextMessage(String from, String message) {
         try {
             out.writeUTF("TEXT:" + from + ":" + message);
@@ -163,7 +140,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /** Envia um arquivo de outro cliente para este. */
+    // Envia um arquivo de outro usuario para este
     synchronized void sendFile(String from, String fileName, byte[] data) {
         try {
             out.writeUTF("FILE:" + from + ":" + fileName + ":" + data.length);
@@ -174,7 +151,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    /** Envia uma linha de texto simples (mensagem de sistema, erro, ok). */
+    // Feedback da mensagem enviada
     synchronized void sendRaw(String text) {
         try {
             out.writeUTF("SYS:" + text);
@@ -184,10 +161,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // ------------------------------------------------------------------ //
-    //  Limpeza
-    // ------------------------------------------------------------------ //
-
+    // Limpeza
     private void cleanup() {
         if (username != null) Server.unregister(username);
         try { socket.close(); } catch (IOException ignored) {}
